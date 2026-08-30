@@ -1,34 +1,43 @@
+-- File: Main.lua
+
 function setup()
-    -- Configurazione della scena 3D con il motore Craft
+    -- Scena 3D
     scene = craft.scene()
     
-    -- Telecamera e Posizione del Giocatore
-    scene.camera.position = vec3(16, 10, 16)
+    -- Telecamera
+    scene.camera.position = vec3(16, 15, -10)
     scene.camera:get(craft.camera).fov = 60
+    scene.camera:get(craft.camera).rotation = quat.eulerAngles(25, 0, 0)
     
-    -- Luce Solare
+    -- Luce
     local sun = scene:entity()
     sun:add(craft.light, craft.light.directional)
     sun.rotation = quat.eulerAngles(45, 45, 0)
     
-    -- Configurazione del Mondo a Voxel (Volume)
-    voxels = scene:entity():add(craft.volume, 32, 32, 32)
-    voxels:add(craft.volumeData)
+    -- Creazione del Mondo Voxel
+    worldEntity = scene:entity()
+    voxels = worldEntity:add(craft.volume, 32, 32, 32)
     
-    -- Definizione dei tipi di blocco
+    -- Inizializza i blocchi e il terreno
     setupBlocks()
-    
-    -- Generazione del Terreno
     generateTerrain()
     
-    -- Variabili di stato per l'interazione
-    selectedBlock = 1 -- 1 = Erba, 2 = Terra, 3 = Pietra
+    selectedBlock = 1
 end
 
-function setupBlocks()
-    -- Registrazione dei blocchi nel registro di Craft
-    -- Usa colori o texture predefinite
-    craft.block.register{ id = 1, name = "Grass", color = color(80, 170, 60) }
-    craft.block.register{ id = 2, name = "Dirt", color = color(120, 80, 40) }
-    craft.block.register{ id = 3, name = "Stone", color = color(120, 120, 120) }
+function update(dt)
+    scene:update(dt)
+end
+
+function draw()
+    update(DeltaTime)
+    scene:draw()
+    
+    -- Disegna l'interfaccia 2D (Mirino)
+    pushStyle()
+    stroke(255)
+    strokeWidth(2)
+    line(WIDTH/2 - 8, HEIGHT/2, WIDTH/2 + 8, HEIGHT/2)
+    line(WIDTH/2, HEIGHT/2 - 8, WIDTH/2, HEIGHT/2 + 8)
+    popStyle()
 end
