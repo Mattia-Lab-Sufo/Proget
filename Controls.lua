@@ -2,17 +2,18 @@
 
 function touched(touch)
     if touch.state == BEGAN then
-        -- Recupera la componente telecamera dall'entità
         local cam = scene.camera:get(craft.camera)
         
         if cam then
-            -- Crea il raggio dal punto in cui tocchi lo schermo
+            -- Genera il raggio dallo schermo verso lo spazio 3D
             local ray = cam:screenToRay(vec2(touch.x, touch.y))
-            local hit = scene:raycast(ray)
             
-            if hit and hit.entity == worldEntity then
+            -- Effettua il raycast direttamente sul volume dei voxel
+            local hit = voxels:raycast(ray)
+            
+            if hit then
                 if touch.tapCount == 1 then
-                    -- Singolo tocco: Rompi il blocco (identifica il blocco centrato)
+                    -- Singolo tocco: Distruggi il blocco colpito
                     local p = hit.point - hit.normal * 0.5
                     local bx = math.floor(p.x + 0.5)
                     local by = math.floor(p.y + 0.5)
@@ -20,7 +21,7 @@ function touched(touch)
                     voxels:set(bx, by, bz, 0)
                     
                 elseif touch.tapCount == 2 then
-                    -- Doppio tocco: Piazza il blocco sulla faccia colpita
+                    -- Doppio tocco: Piazza il blocco selezionato sulla faccia colpita
                     local p = hit.point + hit.normal * 0.5
                     local bx = math.floor(p.x + 0.5)
                     local by = math.floor(p.y + 0.5)
